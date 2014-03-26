@@ -12,6 +12,7 @@ let calculate (input: string) =
                 System.Int32.Parse(string c)
 
         match input with
+        | c :: '/' :: 'X' :: rest -> 20 + calculate ('X' :: rest)
         | c :: '/' :: next :: [] -> 10 + score next
         | c :: '/' :: next :: rest -> 10 + score next + calculate (next :: rest)
         | 'X' :: 'X' :: 'X' :: rest -> 30 + calculate ('X' :: 'X' :: rest)
@@ -96,3 +97,9 @@ let ``Triple strike with gutter game scores sixty`` ()=
     "XXX---------------"
     |> calculate
     |> should equal 60
+
+[<Fact>]
+let ``Spare with following strike with gutter game scores thirty`` ()=
+    "4/X-----------------"
+    |> calculate
+    |> should equal 30
