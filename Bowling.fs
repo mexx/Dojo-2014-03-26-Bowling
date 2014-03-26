@@ -6,12 +6,11 @@ open FsUnit.Xunit
 let calculate (input: string) =
     let rec calculate (input: char list) =
         let score c =
-            if (c = '-') then
-                0
-            elif (c = 'X') then
-                10
-            else
-                System.Int32.Parse(string c)
+            match c with
+            | '-'
+            | '/' -> 0
+            | 'X' -> 10
+            | c -> System.Int32.Parse(string c)
 
         let notAtEnd rest f =
             match rest with
@@ -21,7 +20,7 @@ let calculate (input: string) =
         match input with
         | c :: '/' :: 'X' :: rest -> 20 + notAtEnd rest (calculate ('X' :: rest))
         | c :: '/' :: next :: rest -> 10 + score next + notAtEnd rest (calculate (next :: rest))
-        | 'X' :: next :: '/' :: rest -> 20 + calculate (next :: '/' :: rest)
+        | 'X' :: next :: '/' :: rest -> 20 + notAtEnd rest (calculate (next :: '/' :: rest))
         | 'X' :: next :: nextnext :: rest -> 10 + score next + score nextnext + notAtEnd rest (calculate (next :: nextnext :: rest))
         | c :: rest -> score c + calculate rest
         | [] -> 0
@@ -137,3 +136,9 @@ let ``Perfect game scores three-hundred`` ()=
     "XXXXXXXXXXXX"
     |> calculate
     |> should equal 300
+
+[<Fact>]
+let ``Strike gutter spare at end of gutter game scores twenty`` ()=
+    "-----------------X-/"
+    |> calculate
+    |> should equal 20
