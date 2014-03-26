@@ -14,6 +14,7 @@ let calculate (input: string) =
                 System.Int32.Parse(string c)
 
         match input with
+        | c :: '/' :: next :: [] -> 10 + score next
         | c :: '/' :: next :: rest -> 10 + score next + calculate (next :: rest)
         | c :: rest -> score c + calculate rest
         | [] -> 0
@@ -51,3 +52,9 @@ let ``Spare and following throw with gutter game scores sixteen`` ()=
     "4/3-----------------"
     |> calculate
     |> should equal 16
+
+[<Fact>]
+let ``Spare and following throw at end of gutter game scores thirteen`` ()=
+    "-----------------4/3"
+    |> calculate
+    |> should equal 13
