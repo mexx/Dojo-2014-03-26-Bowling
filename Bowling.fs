@@ -119,3 +119,21 @@ let ``Double strike at end of gutter game scores twenty`` ()=
     "-----------------XX-"
     |> calculate
     |> should equal 20
+
+[<Fact>]
+let ``Strike gutter strike at end of gutter game scores twenty`` ()=
+    "-----------------X-X"
+    |> calculate
+    |> should equal 20
+
+[<Fact>]
+let ``Triple strike at end of gutter game scores thirty`` ()=
+    "-----------------XXX"
+    |> calculate
+    |> should equal 30
+
+[<Fact>]
+let ``Perfect game scores three-hundred`` ()=
+    "XXXXXXXXXXXX"
+    |> calculate
+    |> should equal 300
