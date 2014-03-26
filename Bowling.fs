@@ -14,7 +14,7 @@ let calculate (input: string) =
                 System.Int32.Parse(string c)
 
         match input with
-        | c :: '/' :: rest -> 10 + calculate rest
+        | c :: '/' :: next :: rest -> 10 + score next + calculate (next :: rest)
         | c :: rest -> score c + calculate rest
         | [] -> 0
 
@@ -35,13 +35,19 @@ let ``Single throw game scores four`` ()=
     |> should equal 4
 
 [<Fact>]
-let ``Single throw at end game scores four`` ()=
+let ``Single throw at end game scores five`` ()=
     "------------------5-"
     |> calculate
     |> should equal 5
-    
+
 [<Fact>]
-let ``Spare and gutter game scores four`` ()=
+let ``Spare and gutter game scores ten`` ()=
     "4/------------------"
     |> calculate
     |> should equal 10
+
+[<Fact>]
+let ``Spare and following throw with gutter game scores sixteen`` ()=
+    "4/3-----------------"
+    |> calculate
+    |> should equal 16
