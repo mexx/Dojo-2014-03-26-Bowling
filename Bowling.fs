@@ -11,10 +11,14 @@ let calculate (input: string) =
             else
                 System.Int32.Parse(string c)
 
+        let calculateIfNotEnd c rest =
+            match rest with
+            | [] -> 0
+            | _ -> calculate(c :: rest)
+
         match input with
-        | c :: '/' :: 'X' :: rest -> 20 + calculate ('X' :: rest)
-        | c :: '/' :: next :: [] -> 10 + score next
-        | c :: '/' :: next :: rest -> 10 + score next + calculate (next :: rest)
+        | c :: '/' :: 'X' :: rest -> 20 + calculateIfNotEnd 'X' rest
+        | c :: '/' :: next :: rest -> 10 + score next + calculateIfNotEnd next rest
         | 'X' :: 'X' :: 'X' :: rest -> 30 + calculate ('X' :: 'X' :: rest)
         | 'X' :: 'X' :: rest -> 20 + calculate ('X' :: rest)
         | 'X' :: next :: '/' :: rest -> 20 + calculate (next :: '/' :: rest)
@@ -103,3 +107,9 @@ let ``Spare with following strike with gutter game scores thirty`` ()=
     "4/X-----------------"
     |> calculate
     |> should equal 30
+
+[<Fact>]
+let ``Spare with following strike at end of gutter game scores twenty`` ()=
+    "-----------------4/X"
+    |> calculate
+    |> should equal 20
