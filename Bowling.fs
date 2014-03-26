@@ -8,21 +8,21 @@ let calculate (input: string) =
         let score c =
             if (c = '-') then
                 0
+            elif (c = 'X') then
+                10
             else
                 System.Int32.Parse(string c)
 
         let calculateIfNotEnd c rest =
             match rest with
             | [] -> 0
-            | _ -> calculate(c :: rest)
+            | _ -> calculate(c @ rest)
 
         match input with
-        | c :: '/' :: 'X' :: rest -> 20 + calculateIfNotEnd 'X' rest
-        | c :: '/' :: next :: rest -> 10 + score next + calculateIfNotEnd next rest
-        | 'X' :: 'X' :: 'X' :: rest -> 30 + calculate ('X' :: 'X' :: rest)
-        | 'X' :: 'X' :: rest -> 20 + calculate ('X' :: rest)
+        | c :: '/' :: 'X' :: rest -> 20 + calculateIfNotEnd ['X'] rest
+        | c :: '/' :: next :: rest -> 10 + score next + calculateIfNotEnd [next] rest
         | 'X' :: next :: '/' :: rest -> 20 + calculate (next :: '/' :: rest)
-        | 'X' :: next :: nextnext :: rest -> 10 + score next + score nextnext + calculate (next :: nextnext :: rest)
+        | 'X' :: next :: nextnext :: rest -> 10 + score next + score nextnext + calculateIfNotEnd (next :: [nextnext]) rest
         | c :: rest -> score c + calculate rest
         | [] -> 0
 
@@ -111,5 +111,11 @@ let ``Spare with following strike with gutter game scores thirty`` ()=
 [<Fact>]
 let ``Spare with following strike at end of gutter game scores twenty`` ()=
     "-----------------4/X"
+    |> calculate
+    |> should equal 20
+
+[<Fact>]
+let ``Double strike at end of gutter game scores twenty`` ()=
+    "-----------------XX-"
     |> calculate
     |> should equal 20
