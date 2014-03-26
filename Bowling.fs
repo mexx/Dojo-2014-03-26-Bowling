@@ -14,7 +14,7 @@ let calculate (input: string) =
         match input with
         | c :: '/' :: next :: [] -> 10 + score next
         | c :: '/' :: next :: rest -> 10 + score next + calculate (next :: rest)
-        | 'X' :: next :: rest -> 10 + score next + calculate (next :: rest)
+        | 'X' :: next :: nextnext :: rest -> 10 + score next + score nextnext + calculate (next :: nextnext :: rest)
         | c :: rest -> score c + calculate rest
         | [] -> 0
 
@@ -70,3 +70,8 @@ let ``Strike and following throw with gutter game scores twenty`` ()=
     |> calculate
     |> should equal 20
 
+[<Fact>]
+let ``Strike and following two throws with gutter game scores twenty-six`` ()=
+    "X53----------------"
+    |> calculate
+    |> should equal 26
