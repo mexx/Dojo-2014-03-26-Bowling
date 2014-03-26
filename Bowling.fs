@@ -3,10 +3,9 @@
 open Xunit
 open FsUnit.Xunit
 
-let calculate (input: string) =
-    let rec calculate (input: char list) =
-        let score c =
-            match c with
+let calculate input =
+    let rec calculate input =
+        let score = function
             | '-'
             | '/' -> 0
             | 'X' -> 10
@@ -18,8 +17,8 @@ let calculate (input: string) =
             | _ -> f
 
         match input with
-        | c :: '/' :: 'X' :: rest -> 20 + notAtEnd rest (calculate ('X' :: rest))
-        | c :: '/' :: next :: rest -> 10 + score next + notAtEnd rest (calculate (next :: rest))
+        | _ :: '/' :: 'X' :: rest -> 20 + notAtEnd rest (calculate ('X' :: rest))
+        | _ :: '/' :: next :: rest -> 10 + score next + notAtEnd rest (calculate (next :: rest))
         | 'X' :: next :: '/' :: rest -> 20 + notAtEnd rest (calculate (next :: '/' :: rest))
         | 'X' :: next :: nextnext :: rest -> 10 + score next + score nextnext + notAtEnd rest (calculate (next :: nextnext :: rest))
         | c :: rest -> score c + calculate rest
@@ -28,6 +27,28 @@ let calculate (input: string) =
     input
     |> List.ofSeq
     |> calculate
+
+let convert lst =
+    let parse x =
+        let gutter x =
+            match x with
+            | 0 -> "-"
+            | x -> string x
+
+        match x with
+        | (10, 0) -> "X"
+        | (first, second) when first + second = 10 -> sprintf "%s/" (gutter first)
+        | (first, second) -> sprintf "%s%s" (gutter first) (gutter second)
+
+    let rec pairs lst =
+        match lst with
+        | a :: b :: rest -> (a, b) :: pairs rest
+        | [] -> []
+
+    lst
+    |> pairs
+    |> Seq.map parse
+    |> Seq.collect id
 
 [<Fact>]
 let ``Gutter game scores zero`` ()=
@@ -142,3 +163,30 @@ let ``Strike gutter spare at end of gutter game scores twenty`` ()=
     "-----------------X-/"
     |> calculate
     |> should equal 20
+
+[<Fact>]
+let ``Real game scores`` ()=
+    "45332/31X9-63-/8/16"
+    |> calculate
+    |> should equal 105
+
+[<Fact>]
+let ``Real game scores with spare at end`` ()=
+    "45332/31X9-63-/8/8/3"
+    |> calculate
+    |> should equal 118
+
+[<Fact>]
+let ``Real game scores with strike at end`` ()=
+    "45332/31X9-63-/8/X23"
+    |> calculate
+    |> should equal 122
+
+
+[<Fact>]
+let ``Convert`` ()=
+    [4;5;3;3;2;8;3;1;10;0;9;0;6;3;0;10;8;2;1;6]
+    |> convert
+    |> calculate
+    |> should equal 105
+
